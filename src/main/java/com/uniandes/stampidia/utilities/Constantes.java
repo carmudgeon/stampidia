@@ -1,8 +1,7 @@
 package com.uniandes.stampidia.utilities;
 
 public enum Constantes {
-    SUCCESS_RESULT("Resultado exitoso"),
-    INVALID_PARAMS_RESULT("Resultado fallido - parámetros de entrada inválidos");
+    SUCCESS_RESULT("Resultado exitoso");
 
     private String description;
 
