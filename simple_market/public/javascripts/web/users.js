@@ -28,8 +28,12 @@
         urlRoot: 'http://localhost:9000/purchases'
     });
     var PurchaseList = Backbone.Collection.extend({
-        model: Compra,
-        url: 'http://localhost:9000/users/1/purchases'
+        initialize: function(models,options) {
+            this.url = 'http://localhost:9000/users/'+options.id +'/purchases';
+        },
+        model: Compra
+        //,
+        //url: 'http://localhost:9000/users/'+this.id +'/purchases'
     });
     
     var UserListView = Backbone.View.extend({
@@ -51,7 +55,7 @@
         carItems: function (e) {
             var id = $(e.currentTarget).data("id");
             var userPurchasesListView;
-            var purchaseCollection = new PurchaseList(id);
+            var purchaseCollection = new PurchaseList([], { id: id });
             userPurchasesListView  = new UserPurchasesListView({collection:purchaseCollection});
         },        
 //Crea la visra formView para un usuario seleccionado
