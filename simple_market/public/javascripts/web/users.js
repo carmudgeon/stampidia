@@ -40,6 +40,7 @@
     var PurchaseList = Backbone.Collection.extend({
         initialize: function(models,options) {
             this.url = 'http://localhost:9000/users/'+options.id +'/purchases';
+            this.userIn= options.id;
         },
         model: Compra
         //,
@@ -161,8 +162,8 @@
         },
         //Crea la visra formView para un usuario nuevo
         newItem: function (e) {
-            var id = $(e.currentTarget).data("id");
-            formUserItemsView.model = new CompraItemUser([], { id: id });
+            console.log (this);
+            formUserItemsView.model = new CompraItemUser([], { id: this.collection.userIn });
             formUserItemsView.render();
         },
 //Borra un usuario dado, el método destroy realiza la invocación al 
