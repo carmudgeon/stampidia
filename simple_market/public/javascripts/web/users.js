@@ -158,7 +158,8 @@
         el: '#content',
 //Eventos que se deben manejar
         events: {
-                "click #new_item": "newItem"
+                "click #new_item": "newItem",
+            "click button.purchase-edit-btn": "editItem"
         },
         //Crea la visra formView para un usuario nuevo
         newItem: function (e) {
@@ -172,6 +173,13 @@
             _.bindAll(this, 'render', 'draw'); // fixes loss of context for 'this' within methods
             this.render();
         },
+         //Crea la vista formView para un producto existente
+         editItem: function (e) {
+             var id = $(e.currentTarget).data("id");
+             var item = this.collection.get(id);
+             formUserItemsView.model = item;
+             formUserItemsView.render();
+         },
 //Recupera la lista de usuarios y genera y agrega el html a la
 //página, el método fetch invoca el servicio REST GET
         render: function () {
@@ -201,7 +209,7 @@
         events: {
             "change input": "changed",
             "click #back_user": "renderList",
-            "click #save_userItem": "saveUserItem",
+            "click #save_userItem": "saveUserItem"
         },
 //Se encarga de actualizar el modelo cada vez que se cambia un valor en el form
         changed: function (evt) {
