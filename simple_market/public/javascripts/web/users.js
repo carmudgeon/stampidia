@@ -27,6 +27,16 @@
         idAttribute: "id",
         urlRoot: 'http://localhost:9000/purchases'
     });
+    var CompraItemUser = Backbone.Model.extend({
+        initialize: function(models,options) {
+            this.url = 'http://localhost:9000/users/'+options.id +'/purchases';
+        },
+        defaults: {
+            nombre: '',
+            valor: ''
+        },
+        idAttribute: "id"
+    });
     var PurchaseList = Backbone.Collection.extend({
         initialize: function(models,options) {
             this.url = 'http://localhost:9000/users/'+options.id +'/purchases';
@@ -36,6 +46,7 @@
         //url: 'http://localhost:9000/users/'+this.id +'/purchases'
     });
     
+    //------- Vista UserList--------------//
     var UserListView = Backbone.View.extend({
 //ID del elemento html donde se insertara el codigo
         el: '#content',
@@ -96,7 +107,7 @@
             }, 'html');
         },
     });
-
+    //------------- Vista formulario de usuario -----------//
     var UserFormView = Backbone.View.extend({
 //ID del elemento html donde se insertara el codigo
         el: '#content',
@@ -140,13 +151,19 @@
         },
     });
     
-    //vista items
+    //-------------- Vista items de un Usuario--------------//
      var UserPurchasesListView = Backbone.View.extend({
 //ID del elemento html donde se insertara el codigo
         el: '#content',
 //Eventos que se deben manejar
         events: {
-
+                "click #new_item": "newItem"
+        },
+        //Crea la visra formView para un usuario nuevo
+        newItem: function (e) {
+            var id = $(e.currentTarget).data("id");
+            formUserItemsView.model = new CompraItemUser([], { id: id });
+            formUserItemsView.render();
         },
 //Borra un usuario dado, el método destroy realiza la invocación al 
 //servicio REST DELETE en la URL dada en el modelo
@@ -174,15 +191,62 @@
         },
     });
     
+    //----------- Vista formulario items usuario -----------//
+
+    var UserItemsFormView = Backbone.View.extend({
+//ID del elemento html donde se insertara el codigo
+        el: '#content',
+//Eventos que se deben manejar
+        events: {
+            "change input": "changed",
+            "click #back_user": "renderList",
+            "click #save_userItem": "saveUserItem",
+        },
+//Se encarga de actualizar el modelo cada vez que se cambia un valor en el form
+        changed: function (evt) {
+            var changed = evt.currentTarget;
+            var value = $(evt.currentTarget).val();
+            var obj = {};
+            obj[changed.id] = value;
+            this.model.set(obj);
+        },
+//Guarda el usuario con los datos dados y despliega la lista de usuarios
+//El método save llama al servicio REST POST o PUT según corresponda
+        saveUserItem: function () {
+            var that = this;
+            this.model.save(null, {success: function (model,
+                        response) {
+                    that.renderList();
+                }});
+        },
+        initialize: function () {
+            _.bindAll(this, 'render', 'changed', 'saveUserItem');
+        },
+        renderList: function () {
+            listView.render();
+        },
+        render: function () {
+            that = this;
+            $.get("/assets/views/user/formItemUserTemplate.html", function (data) {
+                template = _.template(data, {
+                    data: that.model.toJSON()
+                });
+                $(that.el).html(template(that.model.toJSON()));
+            }, 'html');
+        },
+    });
+    
 
     //Inicializar las vistas
     var listView;
     var formView;
+    var formUserItemsView;
     
     $(document).ready(function () {
         var userCollection = new UserList();
         listView = new UserListView({collection: userCollection});
         formView = new UserFormView({model: new User()});
+        formUserItemsView = new UserItemsFormView({model: new Compra()});
     });
 
 })(jQuery);
